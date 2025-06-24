@@ -1,9 +1,10 @@
 import Requisições
 
+#Calculo da taxa de câmbio real
 def cambio_real():
     cr = (Requisições.cambio() * Requisições.inflacao_eua()) / Requisições.ipca()
     while True:
-        try:
+        try: # Valida se o valor digitado será valor floot
             valor_desejado = float(input('\33[mValor em reais: ')) 
         except (ValueError, TypeError):
             print('\33[31mDigite um valor válido')

@@ -3,13 +3,14 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
-chave_api = os.getenv("CHAVE_API")
+load_dotenv() #Variáveis globais
+chave_api = os.getenv("CHAVE_API") 
 series_id = os.getenv("SERIES_ID")
 
+#Função responsável por retonar a cotação do dolar
 def cambio():
     try:
-        req = requests.get("https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL")
+        req = requests.get("https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL") #API
         req.raise_for_status()
         dados = req.json()
         if  "USDBRL" in dados and "bid" in dados["USDBRL"]:
@@ -22,12 +23,13 @@ def cambio():
     except (requests.exceptions.RequestException, ValueError, KeyError):
         return None
     
+#Função responsável por retonar indice da inflação. Indice usado: IPCA
 def ipca():
     try:
         data_inicial = (datetime.now() - timedelta(days=365)).strftime("%d/%m/%Y")
         data_final = datetime.now().strftime("%d/%m/%Y")
-        req = requests.get(f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.10844/dados?formato=json&dataInicial={data_inicial}&dataFinal={data_final}")
-        req.raise_for_status()
+        req = requests.get(f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.10844/dados?formato=json&dataInicial={data_inicial}&dataFinal={data_final}") #API
+        req.raise_for_status() # Função do modulo requests que retorna o status da api
         dados = req.json()
         inflacao_acumulada = sum(float(item["valor"]) for item in dados if "valor" in item)
         print(f"Inflação acumulada nos últimos 12 meses: {inflacao_acumulada:.2f}%")
@@ -35,9 +37,10 @@ def ipca():
     except (requests.exceptions.RequestException, ValueError, KeyError):
         return None
     
+#Função responsável por retonar a inflação dos EUA
 def inflacao_eua():
     try:
-        req = requests.get(f"https://api.stlouisfed.org/fred/series/observations?series_id={series_id}&api_key={chave_api}&file_type=json&sort_order=desc&limit=1")
+        req = requests.get(f"https://api.stlouisfed.org/fred/series/observations?series_id={series_id}&api_key={chave_api}&file_type=json&sort_order=desc&limit=1") #API
         req.raise_for_status()
         dados = req.json()
         if "observations" in dados and len(dados["observations"]) > 0:
